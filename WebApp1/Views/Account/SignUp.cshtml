@@ -1,0 +1,122 @@
+﻿@model WebApp1.Models.UserModel
+
+@{
+    ViewData["Title"] = "SignUp";
+}
+
+<h1>SignUp</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SignUp">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Username" class="control-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Contact" class="control-label"></label>
+                <input asp-for="Contact" class="form-control" />
+                <span asp-validation-for="Contact" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country" class="control-label"></label>
+                <select id="country" asp-for="Country" class="form-control"></select>
+                <span id="countryeror" asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City" class="control-label"></label>
+                <select id="city" asp-for="City" class="form-control"></select>
+                <span id="cityerror" asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label"></label>
+                <input asp-for="Gender" class="form-control" />
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Terms" /> @Html.DisplayNameFor(model => model.Terms)
+                </label>
+                <span asp-validation-for="Terms" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" id="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        jQuery.validator.unobtrusive.adapters.add("checkbox", function (options) {
+            // jQuery Validate equates "required" with "mandatory" for checkbox elements
+            if (options.element.tagName.toUpperCase() == "INPUT" && options.element.type.toUpperCase() == "CHECKBOX") {
+                setValidationValues(options, "required", true);
+                if (options.message) {
+                    options.messages["required"] = options.message;
+                }
+            }
+        });
+        $(document).ready(function () {
+            // Get a list of countries and a list of cities
+            $.getJSON('/Account/GetCountries/', null, function (data) {
+                $('#country').append('<option value=0>--Select--</option>');
+                $('#city').append('<option value=0>--Select--</option>');
+                $.each(data, function () {
+                    console.log(data);
+                    $('#country').append('<option value=' + this.countryID + '>' + this.countryName + '</option>');
+                });
+                //$.getJSON('/Account/GetCities/', { CID: $('#country').val() }, function (data) {
+                //    $.each(data, function () {
+                //        $('#city').append('<select value=' + this.cityID + '>' + this.cityName + '</select>');
+                //    });
+                //}).fail(function () {
+                //    alert('Cannot retrieve cities!');
+                //});
+            }).fail(function () {
+                alert('Cannot retrieve countries!');
+            });
+            $('#country').change(function () {
+                $('#city').append('<option value=0>--Select--</option>');
+                $('#city option').remove();
+                $.getJSON('/Account/getcities/', { CID: $('#country').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#city').append('<option value=' +
+                            this.cityID + '>' + this.cityName + '</option>');
+                    });
+                }).fail(function () {
+                    alert('Cannot retrieve cities!');
+                });
+            });
+            //$('#submit').click(function () {
+            //    var country = $('#country').val();
+            //    var city = $('#city').val();
+            //    if (country == 0) {
+            //        document.getElementById('countryerror').innerHTML = 'Please select Country';
+            //    }
+            //    else if (city == 0) {
+            //        document.getElementById('cityerror').innerHTML = 'Please select City'
+            //    }
+
+            //});
+        });
+    </script>
+}
